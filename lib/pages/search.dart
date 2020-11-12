@@ -1,57 +1,49 @@
-import 'package:covid_tracker/pages/search.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:covid_tracker/datasource.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
-class CountryPage extends StatefulWidget {
-  @override
-  _CountryPageState createState() => _CountryPageState();
-}
-
-class _CountryPageState extends State<CountryPage> {
-
-  List countryData;
-  fetchCountryWideData()async{
-    http.Response response  = await http.get(DataSource.apiUrlMostAffected);
-    setState(() {
-      countryData = json.decode(response.body);
-    });
-  }
-
+class Search extends SearchDelegate{
+  final List countryList;
+  Search(this.countryList);
 
   @override
-  void initState() {
-    fetchCountryWideData();
-    super.initState();
+  List<Widget> buildActions(BuildContext context) {
+    return [
+      IconButton(icon: Icon(Icons.clear), onPressed: (){
+        query='';
+      })
+    ]
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        actions: <Widget>[
-          IconButton(icon: Icon(Icons.search), onPressed: (){
-            showSearch(context: context, delegate: Search(countryData));
-          })
-        ],
-        title: Text("COUNTRY STATS")
-      ),
-      body:countryData==null?Center(child:CircularProgressIndicator()):ListView.builder(
-        itemCount: countryData==null?0:countryData.length,
-        itemBuilder: (context,index) {
+  Widget buildLeading(BuildContext context) {
+    return IconButton(icon: Icon(Icons.arrow_back_ios), onPressed: (){
+      Navigator.pop(context);
+    })
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    return Container();
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    final suggestionList = query.isEmpty?
+                            countryList:
+                            countryList.where((element) => element['country'].toString().toLowerCase().startsWith(query)).toList();
+    return ListView.builder(
+        itemCount: suggestionList.length,
+        itemBuilder: (context,index){
           return Container(
             height: 130,
             margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
             decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey[100],
-                  offset: Offset(0,10),
-                )
-              ]
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey[100],
+                    offset: Offset(0,10),
+                  )
+                ]
             ),
             child: Row(
               children: <Widget>[
@@ -62,8 +54,8 @@ class _CountryPageState extends State<CountryPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Text(countryData[index]['country'],style: TextStyle(fontWeight: FontWeight.bold)),
-                      Image.network(countryData[index]['countryInfo']['flag'],height: 50, width: 60)
+                      Text(suggestionList[index]['country'],style: TextStyle(fontWeight: FontWeight.bold)),
+                      Image.network(suggestionList[index]['countryInfo']['flag'],height: 50, width: 60)
                     ],
                   ),
                 ),
@@ -74,28 +66,28 @@ class _CountryPageState extends State<CountryPage> {
                       children: <Widget>[
                         Text(
                           'CONFIRMED:' +
-                              countryData[index]['cases'].toString(),
+                              suggestionList[index]['cases'].toString(),
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.red),
                         ),
                         Text(
                           'ACTIVE:' +
-                              countryData[index]['active'].toString(),
+                              suggestionList[index]['active'].toString(),
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.blue),
                         ),
                         Text(
                           'RECOVERED:' +
-                              countryData[index]['recovered'].toString(),
+                              suggestionList[index]['recovered'].toString(),
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.green),
                         ),
                         Text(
                           'DEATHS:' +
-                              countryData[index]['deaths'].toString(),
+                              suggestionList[index]['deaths'].toString(),
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Theme.of(context).brightness==Brightness.dark?Colors.grey[100]:Colors.grey[900]),
@@ -108,8 +100,8 @@ class _CountryPageState extends State<CountryPage> {
               ],
             ),
           );
-        } ,
-      )
-    );
+        });
+
   }
+
 }
