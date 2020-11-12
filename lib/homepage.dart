@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:covid_tracker/datasource.dart';
+import 'package:covid_tracker/panels/mostaffected.dart';
 import 'package:covid_tracker/panels/worldwidepanel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -21,13 +22,20 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  List countryData;
+  fetchCountryWideData()async{
+    http.Response response  = await http.get(DataSource.apiUrlMostAffected);
+    setState(() {
+      countryData = json.decode(response.body);
+    });
+  }
+
   @override
   void initState() {
     fetchWorldWideData();
+    fetchCountryWideData();
     super.initState();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -48,13 +56,28 @@ class _HomePageState extends State<HomePage> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 10),
-            child: Text('WORLDWIDE',style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold)),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('WORLDWIDE',style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold)),
+                Container(
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        color: primaryBlack,
+                        borderRadius: BorderRadius.circular(15)
+                    ),
+                    child: Text('Regional',style: TextStyle(fontSize: 16,color: Colors.white, fontWeight: FontWeight.bold))),
+              ],
+            ),
           ),
-          Container(
-            alignment: Alignment.center,
-            child: worldWideData==null?CircularProgressIndicator(
-            ):WorldWidePanel(worldWideData:worldWideData),
-          )
+          worldWideData==null?CircularProgressIndicator():WorldWidePanel(worldWideData:worldWideData),
+          SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal:10.0),
+            child: Text('MOST AFFECTED COUNTRIES',style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold)),
+          ),
+          SizedBox(height: 10),
+          countryData==null?CircularProgressIndicator():MostAffectedPanel(countryData:countryData),
         ],
       )),
     );

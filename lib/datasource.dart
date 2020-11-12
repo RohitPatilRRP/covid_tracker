@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 Color primaryBlack = Color(0xff202c3b);
 
 class DataSource {
+
   static String quote =
       "Nothing in life is to be feared, it is only to be understood. Now is the time to understand more, so that we may fear less.";
 
   static String apiUrlWorldWide = "https://corona.lmao.ninja/v3/covid-19/all";
+
+  static String apiUrlMostAffected = "https://corona.lmao.ninja/v3/covid-19/countries";
 
   static List questionAnswers = [
     {
