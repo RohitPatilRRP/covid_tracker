@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:covid_tracker/datasource.dart';
+import 'package:covid_tracker/panels/infopanel.dart';
 import 'package:covid_tracker/panels/mostaffected.dart';
 import 'package:covid_tracker/panels/worldwidepanel.dart';
 import 'package:flutter/material.dart';
@@ -70,14 +71,17 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-          worldWideData==null?CircularProgressIndicator():WorldWidePanel(worldWideData:worldWideData),
+          worldWideData==null?
+          Container(alignment: Alignment.center, child: CircularProgressIndicator()):WorldWidePanel(worldWideData:worldWideData),
           SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal:10.0),
             child: Text('MOST AFFECTED COUNTRIES',style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold)),
           ),
           SizedBox(height: 10),
-          countryData==null?CircularProgressIndicator():MostAffectedPanel(countryData:countryData),
+          countryData==null?Container(alignment: Alignment.center, child: CircularProgressIndicator()):MostAffectedPanel(countryData:countryData),
+          InfoPanel(),
+          SizedBox(height: 50)
         ],
       )),
     );

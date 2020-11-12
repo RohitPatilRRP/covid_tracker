@@ -9,7 +9,11 @@ class DataSource {
 
   static String apiUrlWorldWide = "https://corona.lmao.ninja/v3/covid-19/all";
 
-  static String apiUrlMostAffected = "https://corona.lmao.ninja/v3/covid-19/countries";
+  static String apiUrlMostAffected = "https://corona.lmao.ninja/v3/covid-19/countries?sort=active";
+
+  static String urlMythBusters = "https://www.who.int/emergencies/diseases/novel-coronavirus-2019/advice-for-public/myth-busters";
+
+  static String urlAboutUs = "https://github.com/shamli06/covid19-flutter-app";
 
   static List questionAnswers = [
     {
