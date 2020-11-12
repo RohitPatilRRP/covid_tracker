@@ -1,9 +1,8 @@
 import 'package:covid_tracker/pages/search.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:covid_tracker/datasource.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
 
 class CountryPage extends StatefulWidget {
   @override
@@ -11,19 +10,20 @@ class CountryPage extends StatefulWidget {
 }
 
 class _CountryPageState extends State<CountryPage> {
-
   List countryData;
-  fetchCountryWideData()async{
-    http.Response response  = await http.get(DataSource.apiUrlMostAffected);
+
+  fetchCountryData() async {
+
+    http.Response response =
+    await http.get('https://corona.lmao.ninja/v2/countries');
     setState(() {
       countryData = json.decode(response.body);
     });
   }
 
-
   @override
   void initState() {
-    fetchCountryWideData();
+    fetchCountryData();
     super.initState();
   }
 
@@ -32,84 +32,87 @@ class _CountryPageState extends State<CountryPage> {
     return Scaffold(
       appBar: AppBar(
         actions: <Widget>[
-          IconButton(icon: Icon(Icons.search), onPressed: (){
+          IconButton(icon: Icon(Icons.search),onPressed: (){
+
             showSearch(context: context, delegate: Search(countryData));
-          })
+
+          },)
         ],
-        title: Text("COUNTRY STATS")
+        title: Text('Country Stats'),
       ),
-      body:countryData==null?Center(child:CircularProgressIndicator()):ListView.builder(
-        itemCount: countryData==null?0:countryData.length,
-        itemBuilder: (context,index) {
-          return Container(
-            height: 130,
-            margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey[100],
-                  offset: Offset(0,10),
-                )
-              ]
-            ),
-            child: Row(
-              children: <Widget>[
-                Container(
-                  width: 200,
-                  margin: EdgeInsets.symmetric(horizontal: 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(countryData[index]['country'],style: TextStyle(fontWeight: FontWeight.bold)),
-                      Image.network(countryData[index]['countryInfo']['flag'],height: 50, width: 60)
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: Container(
+      body: countryData == null
+          ? Center(
+        child: CircularProgressIndicator(),
+      )
+          : ListView.builder(
+        itemBuilder: (context, index) {
+          return Card(
+            child: Container(
+              height: 130,
+              margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              child: Row(
+                children: <Widget>[
+                  Container(
+                    width: 200,
+                    margin: EdgeInsets.symmetric(horizontal: 10),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         Text(
-                          'CONFIRMED:' +
-                              countryData[index]['cases'].toString(),
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.red),
+                          countryData[index]['country'],
+                          style: TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        Text(
-                          'ACTIVE:' +
-                              countryData[index]['active'].toString(),
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.blue),
-                        ),
-                        Text(
-                          'RECOVERED:' +
-                              countryData[index]['recovered'].toString(),
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.green),
-                        ),
-                        Text(
-                          'DEATHS:' +
-                              countryData[index]['deaths'].toString(),
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).brightness==Brightness.dark?Colors.grey[100]:Colors.grey[900]),
+                        Image.network(
+                          countryData[index]['countryInfo']['flag'],
+                          height: 50,
+                          width: 60,
                         ),
                       ],
                     ),
-
                   ),
-                )
-              ],
+                  Expanded(
+                      child: Container(
+                        child: Column(
+                          children: <Widget>[
+                            Text(
+                              'CONFIRMED:' +
+                                  countryData[index]['cases'].toString(),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.red),
+                            ),
+                            Text(
+                              'ACTIVE:' +
+                                  countryData[index]['active'].toString(),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blue),
+                            ),
+                            Text(
+                              'RECOVERED:' +
+                                  countryData[index]['recovered'].toString(),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.green),
+                            ),
+                            Text(
+                              'DEATHS:' +
+                                  countryData[index]['deaths'].toString(),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(context).brightness==Brightness.dark?Colors.grey[100]:Colors.grey[900]),
+                            ),
+                          ],
+                        ),
+                      ))
+                ],
+              ),
             ),
           );
-        } ,
-      )
+        },
+        itemCount: countryData == null ? 0 : countryData.length,
+      ),
     );
   }
 }
