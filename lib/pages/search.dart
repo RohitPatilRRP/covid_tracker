@@ -1,51 +1,57 @@
-import 'package:covid_tracker/pages/search.dart';
+import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:covid_tracker/datasource.dart';
 
 
-class CountryPage extends StatefulWidget {
+class Search extends SearchDelegate{
+
+  final List countryList;
+
+  Search(this.countryList);
+
+
   @override
-  _CountryPageState createState() => _CountryPageState();
-}
-
-class _CountryPageState extends State<CountryPage> {
-  List countryData;
-
-  fetchCountryData() async {
-
-    http.Response response =
-    await http.get('https://corona.lmao.ninja/v2/countries');
-    setState(() {
-      countryData = json.decode(response.body);
-    });
+  ThemeData appBarTheme(BuildContext context) {
+    return ThemeData(
+        primaryColor: primaryBlack,
+        brightness: DynamicTheme.of(context).brightness
+    );
   }
 
   @override
-  void initState() {
-    fetchCountryData();
-    super.initState();
+  List<Widget> buildActions(BuildContext context) {
+    return [
+      IconButton(icon: Icon(Icons.clear), onPressed: (){
+        query='';
+
+      })
+    ];
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        actions: <Widget>[
-          IconButton(icon: Icon(Icons.search),onPressed: (){
+  Widget buildLeading(BuildContext context) {
+    return IconButton(icon: Icon(Icons.arrow_back_ios),onPressed: (){
+      Navigator.pop(context);
+    },);
+  }
 
-            showSearch(context: context, delegate: Search(countryData));
+  @override
+  Widget buildResults(BuildContext context) {
+    return Container();
+  }
 
-          },)
-        ],
-        title: Text('Country Stats'),
-      ),
-      body: countryData == null
-          ? Center(
-        child: CircularProgressIndicator(),
-      )
-          : ListView.builder(
-        itemBuilder: (context, index) {
+  @override
+  Widget buildSuggestions(BuildContext context)
+  {
+    final suggestionList
+    =
+    query.isEmpty?
+    countryList:
+    countryList.where((element) => element['country'].toString().toLowerCase().startsWith(query)).toList();
+
+    return ListView.builder(
+        itemCount: suggestionList.length,
+        itemBuilder: (context,index){
           return Card(
             child: Container(
               height: 130,
@@ -60,11 +66,11 @@ class _CountryPageState extends State<CountryPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         Text(
-                          countryData[index]['country'],
+                          suggestionList[index]['country'],
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         Image.network(
-                          countryData[index]['countryInfo']['flag'],
+                          suggestionList[index]['countryInfo']['flag'],
                           height: 50,
                           width: 60,
                         ),
@@ -77,31 +83,31 @@ class _CountryPageState extends State<CountryPage> {
                           children: <Widget>[
                             Text(
                               'CONFIRMED:' +
-                                  countryData[index]['cases'].toString(),
+                                  suggestionList[index]['cases'].toString(),
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.red),
                             ),
                             Text(
                               'ACTIVE:' +
-                                  countryData[index]['active'].toString(),
+                                  suggestionList[index]['active'].toString(),
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.blue),
                             ),
                             Text(
                               'RECOVERED:' +
-                                  countryData[index]['recovered'].toString(),
+                                  suggestionList[index]['recovered'].toString(),
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.green),
                             ),
                             Text(
                               'DEATHS:' +
-                                  countryData[index]['deaths'].toString(),
+                                  suggestionList[index]['deaths'].toString(),
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: Theme.of(context).brightness==Brightness.dark?Colors.grey[100]:Colors.grey[900]),
+                                  color:  Theme.of(context).brightness==Brightness.dark?Colors.grey[100]:Colors.grey[900]),
                             ),
                           ],
                         ),
@@ -110,9 +116,6 @@ class _CountryPageState extends State<CountryPage> {
               ),
             ),
           );
-        },
-        itemCount: countryData == null ? 0 : countryData.length,
-      ),
-    );
+        });
   }
 }

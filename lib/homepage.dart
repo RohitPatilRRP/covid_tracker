@@ -5,6 +5,7 @@ import 'package:covid_tracker/pages/countrypage.dart';
 import 'package:covid_tracker/panels/infopanel.dart';
 import 'package:covid_tracker/panels/mostaffected.dart';
 import 'package:covid_tracker/panels/worldwidepanel.dart';
+import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
@@ -43,6 +44,11 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        actions: <Widget>[
+          IconButton(icon: Icon(Theme.of(context).brightness==Brightness.light?Icons.lightbulb_outline:Icons.highlight), onPressed: (){
+            DynamicTheme.of(context).setBrightness(Theme.of(context).brightness==Brightness.light?Brightness.dark:Brightness.light);
+          })
+        ],
         centerTitle: true,
         title: Text('COVID-TRACKER'),
       ),
